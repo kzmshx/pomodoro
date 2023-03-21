@@ -77,6 +77,7 @@ function App() {
     return (
         <div>
             <h1>{remainingTime}</h1>
+            {alarmRinging && <h1>Ringing</h1>}
             <button onClick={() => setTimerRunning(!timerRunning)}>{timerButtonLabel}</button>
             <button onClick={() => setAlarmRinging(false)} disabled={alarmStopButtonDisabled}>アラーム停止</button>
             <table>
