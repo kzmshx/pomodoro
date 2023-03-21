@@ -19,8 +19,8 @@ const defaultTimerItems: TimerItem[] = [
 ]
 
 const TimerButtonMode = {
-    START: 'start',
-    STOP: 'stop',
+    Start: 'start',
+    Stop: 'stop',
 } as const
 
 type TimerButtonMode = typeof TimerButtonMode[keyof typeof TimerButtonMode]
@@ -28,18 +28,18 @@ type TimerButtonMode = typeof TimerButtonMode[keyof typeof TimerButtonMode]
 
 function App() {
     const [timerItems, setTimerItems] = useState<TimerItem[]>(defaultTimerItems)
-    const [timerButtonMode, setTimerButtonMode] = useState<TimerButtonMode>(TimerButtonMode.START)
+    const [timerButtonMode, setTimerButtonMode] = useState<TimerButtonMode>(TimerButtonMode.Start)
     const timerButtonLabel = match(timerButtonMode)
-        .with(TimerButtonMode.START, (): string => 'スタート')
-        .with(TimerButtonMode.STOP, (): string => 'ストップ')
+        .with(TimerButtonMode.Start, (): string => 'スタート')
+        .with(TimerButtonMode.Stop, (): string => 'ストップ')
         .exhaustive()
     const [alarmStopButtonDisabled, setAlarmStopButtonDisabled] = useState(true)
 
     const handleTimerButtonClick = () => {
-        if (timerButtonMode === TimerButtonMode.START) {
-            setTimerButtonMode(TimerButtonMode.STOP)
-        } else if (timerButtonMode === TimerButtonMode.STOP) {
-            setTimerButtonMode(TimerButtonMode.START)
+        if (timerButtonMode === TimerButtonMode.Start) {
+            setTimerButtonMode(TimerButtonMode.Stop)
+        } else if (timerButtonMode === TimerButtonMode.Stop) {
+            setTimerButtonMode(TimerButtonMode.Start)
         } else {
             throw new Error('Unknown timer button mode')
         }
