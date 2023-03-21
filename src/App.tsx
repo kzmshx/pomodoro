@@ -1,59 +1,84 @@
-import React, {useState} from 'react';
-import {match} from "ts-pattern";
+import React, {useEffect, useMemo, useState} from 'react';
+
+function useInterval(callback: Function, delay: number | null) {
+    useEffect(() => {
+        if (delay !== null) {
+            const interval = setInterval(() => {
+                callback()
+            }, delay || 0)
+            return () => clearInterval(interval)
+        }
+    }, [callback, delay])
+}
 
 type TimerItem = {
     name: string
     seconds: number
-    active: boolean
 }
 
-const defaultTimerItems: TimerItem[] = [
-    {name: '作業', seconds: 1500, active: false},
-    {name: '短休憩', seconds: 300, active: false},
-    {name: '作業', seconds: 1500, active: false},
-    {name: '短休憩', seconds: 300, active: false},
-    {name: '作業', seconds: 1500, active: false},
-    {name: '短休憩', seconds: 300, active: false},
-    {name: '作業', seconds: 1500, active: false},
-    {name: '長休憩', seconds: 900, active: false},
+type CurrentTimer = {
+    index: number
+    remainingSeconds: number
+}
+
+const timerItems: TimerItem[] = [
+    {name: '作業', seconds: 1500},
+    {name: '短休憩', seconds: 300},
+    {name: '作業', seconds: 1500},
+    {name: '短休憩', seconds: 300},
+    {name: '作業', seconds: 1500},
+    {name: '短休憩', seconds: 300},
+    {name: '作業', seconds: 1500},
+    {name: '長休憩', seconds: 900},
 ]
 
-const TimerButtonMode = {
-    Start: 'start',
-    Stop: 'stop',
-} as const
-
-type TimerButtonMode = typeof TimerButtonMode[keyof typeof TimerButtonMode]
-
-
 function App() {
-    const [timerItems, setTimerItems] = useState<TimerItem[]>(defaultTimerItems)
-    const [timerButtonMode, setTimerButtonMode] = useState<TimerButtonMode>(TimerButtonMode.Start)
-    const timerButtonLabel = match(timerButtonMode)
-        .with(TimerButtonMode.Start, (): string => 'スタート')
-        .with(TimerButtonMode.Stop, (): string => 'ストップ')
-        .exhaustive()
-    const [alarmStopButtonDisabled, setAlarmStopButtonDisabled] = useState(true)
+    const [timer, setTimer] = useState<CurrentTimer>({
+        index: 0,
+        remainingSeconds: timerItems[0].seconds,
+    })
+    const remainingTime = useMemo(
+        () => {
+            const minutes = Math.floor(timer.remainingSeconds / 60).toString().padStart(2, '0')
+            const seconds = (timer.remainingSeconds % 60).toString().padStart(2, '0')
+            return `${minutes}:${seconds}`
+        },
+        [timer]
+    )
 
-    const handleTimerButtonClick = () => {
-        if (timerButtonMode === TimerButtonMode.Start) {
-            setTimerButtonMode(TimerButtonMode.Stop)
-        } else if (timerButtonMode === TimerButtonMode.Stop) {
-            setTimerButtonMode(TimerButtonMode.Start)
+    const [timerRunning, setTimerRunning] = useState(false)
+    const timerButtonLabel = useMemo(
+        () => timerRunning ? 'ストップ' : 'スタート',
+        [timerRunning]
+    )
+
+    const [alarmRinging, setAlarmRinging] = useState(false)
+    const alarmStopButtonDisabled = useMemo(
+        () => !alarmRinging,
+        [alarmRinging]
+    )
+
+    useInterval(() => {
+        if (timer.remainingSeconds === 0) {
+            const nextIndex = (timer.index + 1) % timerItems.length
+            setTimer({
+                index: nextIndex,
+                remainingSeconds: timerItems[nextIndex].seconds,
+            })
+            setAlarmRinging(true)
         } else {
-            throw new Error('Unknown timer button mode')
+            setTimer({
+                ...timer,
+                remainingSeconds: timer.remainingSeconds - 1,
+            })
         }
-    }
-
-    const handleAlarmStopButtonClick = () => {
-        setAlarmStopButtonDisabled(true)
-    }
+    }, timerRunning ? 1000 : null)
 
     return (
         <div>
-            <h1>23:45</h1>
-            <button onClick={handleTimerButtonClick}>{timerButtonLabel}</button>
-            <button onClick={handleAlarmStopButtonClick} disabled={alarmStopButtonDisabled}>アラーム停止</button>
+            <h1>{remainingTime}</h1>
+            <button onClick={() => setTimerRunning(!timerRunning)}>{timerButtonLabel}</button>
+            <button onClick={() => setAlarmRinging(false)} disabled={alarmStopButtonDisabled}>アラーム停止</button>
             <table>
                 <thead>
                 <tr>
@@ -62,13 +87,15 @@ function App() {
                 <tr>
                     <th>メニュー</th>
                     <th>時間（min）</th>
+                    <th>起動中</th>
                 </tr>
                 </thead>
                 <tbody>
-                {timerItems.map((timer, index) => (
-                    <tr key={index}>
-                        <td>{timer.name}</td>
-                        <td>{timer.seconds / 60}</td>
+                {timerItems.map((t, i) => (
+                    <tr key={i}>
+                        <td>{t.name}</td>
+                        <td>{t.seconds / 60}</td>
+                        <td>{i === timer.index ? 'YES' : 'NO'}</td>
                     </tr>
                 ))}
                 </tbody>
