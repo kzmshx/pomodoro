@@ -19,6 +19,17 @@ const timerItems: TimerItem[] = [
     {name: '長休憩', seconds: mtos(15)},
 ]
 
+function Button({children, className, disabled, onClick}: {
+    children?: React.ReactNode
+    className?: string
+    disabled?: boolean
+    onClick: () => void
+}) {
+    return <button className={[className, "bg-neutral-300"].join(' ')}
+                   disabled={disabled}
+                   onClick={onClick}>{children}</button>
+}
+
 function App() {
     const [timerIndex, setTimerIndex] = useState(0)
     const [timerRemainingSeconds, setTimerRemainingSeconds] = useState(timerItems[0].seconds)
@@ -85,30 +96,31 @@ function App() {
     }, [alarmRinging])
 
     return (
-        <div>
-            <h1>{remainingTime}</h1>
-            {alarmRinging && <h1>Ringing</h1>}
-            <button onClick={handleTimerButtonClick}>{timerButtonLabel}</button>
-            <button onClick={handleAlarmStopButtonClick} disabled={alarmStopButtonDisabled}>アラーム停止</button>
-            <table>
-                <thead>
-                <tr>
-                    <th colSpan={2}>ポモドーロ・メニュー</th>
-                </tr>
-                <tr>
-                    <th>メニュー</th>
-                    <th>時間（min）</th>
-                </tr>
-                </thead>
-                <tbody>
-                {timerItems.map((t, i) => (
-                    <tr key={i} style={{fontWeight: i === timerIndex ? 'bold' : 'normal'}}>
-                        <td>{t.name}</td>
-                        <td>{t.seconds / 60}</td>
-                    </tr>
-                ))}
-                </tbody>
-            </table>
+        <div className={"container mx-auto my-20"}>
+            <div className={"m-10 text-center text-7xl"}>{remainingTime}</div>
+            <div className={"m-10 grid grid-cols-1 place-items-center space-y-5 text-3xl"}>
+                <Button className={"w-36 h-14"} onClick={handleTimerButtonClick}>{timerButtonLabel}</Button>
+                <Button className={"w-52 h-14"} onClick={handleAlarmStopButtonClick}
+                        disabled={alarmStopButtonDisabled}>アラーム停止</Button>
+            </div>
+            <div className={"container w-96 mx-auto my-10"}>
+                <div className={"w-80 mx-auto my-10 grid grid-cols-2 place-items-center gap-2"}>
+                    <div className={"w-full col-span-2 grid grid-cols-1 place-items-center gap-2 text-2xl"}>
+                        <div>ポモドーロ・メニュー</div>
+                    </div>
+                    <div className={"w-full col-span-2 grid grid-cols-2 place-items-center gap-2"}>
+                        <div className={"col-span-1 text-xl"}>メニュー</div>
+                        <div className={"col-span-1 text-xl"}>時間（min）</div>
+                    </div>
+                    {timerItems.map((t, i) => (
+                        <div key={i}
+                             className={`w-full col-span-2 grid grid-cols-2 place-items-center gap-2 ${i === timerIndex ? "bg-amber-200 font-bold" : ""}`}>
+                            <div className={"col-span-1 text-lg"}>{t.name}</div>
+                            <div className={"col-span-1 text-lg"}>{t.seconds / 60}</div>
+                        </div>
+                    ))}
+                </div>
+            </div>
         </div>
     );
 }
