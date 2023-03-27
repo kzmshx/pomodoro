@@ -101,7 +101,7 @@ function App() {
 
     return (
         <div className={"container mx-auto my-20"}>
-            <div className={"m-10 text-center text-7xl"}>{remainingTime}</div>
+            <div className={"m-10 text-center text-7xl font-mono"}>{remainingTime}</div>
             <div className={"m-10 grid grid-cols-1 place-items-center space-y-5 text-3xl"}>
                 <Button className={"w-36 h-14"} onClick={handleTimerButtonClick}>{timerButtonLabel}</Button>
                 <Button className={"w-52 h-14"} onClick={handleAlarmStopButtonClick}
