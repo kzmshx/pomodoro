@@ -25,9 +25,13 @@ function Button({children, className, disabled, onClick}: {
     disabled?: boolean
     onClick: () => void
 }) {
-    return <button className={[className, "bg-neutral-300"].join(' ')}
-                   disabled={disabled}
-                   onClick={onClick}>{children}</button>
+    return <button
+        className={[
+            className,
+            (disabled ? "bg-neutral-500" : "bg-neutral-200 hover:bg-neutral-300")
+        ].join(' ')}
+        disabled={disabled}
+        onClick={onClick}>{children}</button>
 }
 
 function App() {
