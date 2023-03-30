@@ -1,4 +1,5 @@
 import React, {useEffect, useMemo, useState} from 'react';
+import coo from './assets/coo.mp3'
 
 const mtos = (minutes: number) => minutes * 60;
 const stoms = (seconds: number) => seconds * 1000;
@@ -84,7 +85,7 @@ function App() {
 
     useEffect(() => {
         if (alarmRinging) {
-            const audio = new Audio('/sound/coo.mp3');
+            const audio = new Audio(coo);
             audio.loop = true
             audio.play()
 
